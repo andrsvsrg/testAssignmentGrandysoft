@@ -1,0 +1,12 @@
+
+.App {
+    display: flex;
+    flex-direction: column;
+}
+.button-block {
+    margin: 10px 30px;
+}
+.canvas {
+    border: 1px solid red;
+    margin: 30px;
+}
