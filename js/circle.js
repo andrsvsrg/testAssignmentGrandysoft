@@ -10,11 +10,6 @@ export class Circle {
       return
     }
     this.defaultRadius -= 4
-    ctx.beginPath()
-    ctx.moveTo(this.x, this.y)
-    ctx.arc(this.x, this.y, this.defaultRadius, 0, Math.PI * 2, true)
-    ctx.fillStyle = '#ff0000'
-    ctx.fill()
   }
 
   drawCircle(ctx) {

@@ -32,19 +32,15 @@ export class App {
     }
     this.isAnimated = true
     const intervalID = setInterval(() => {
-      this.canvas.collapseAllLine()   //////////////////////////////////
+      this.canvas.collapseAllLine()
       this.canvas.animationCounter -= 0.005
       this.canvas.drawAll()
-
-      // Если начало или конеч линии (х у) хотя бы одной линии лежит на точке , начать уменьшать её
 
       const arrStartDelete = this.canvas.checkEndLinePositionForPoint()
       arrStartDelete.forEach((point) => {
         point.collapseCircle(this.canvas.ctx)
       })
 
-
-      ///////////////////
       if (this.canvas.animationCounter <= 0.0001) {
         this.canvas.clearArea()
         clearInterval(intervalID)
@@ -56,6 +52,9 @@ export class App {
   }
 
   onCanvasClick() {
+    if (this.isAnimated) {
+      return
+    }
     if (!this.isDriwing) {
       this.canvas.startDraw(this.mousePosition)
       this.isDriwing = true
