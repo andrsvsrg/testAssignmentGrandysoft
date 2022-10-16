@@ -5,7 +5,7 @@ export class Canvas {
   constructor() {
     this.canvasArea = document.querySelector('.canvas')
     this.ctx = this.canvasArea.getContext('2d')
-    this.ctx.globalAlpha = 1
+    this.animationCounter = 1
     this.width = this.canvasArea.width
     this.height = this.canvasArea.height
     this.allLine = []
@@ -39,6 +39,28 @@ export class Canvas {
     this.ctx.stroke()
   }
 
+  checkEndLinePositionForPoint() {
+    const deletePoint = new Set()
+
+    this.allLine.some(({ startX, startY, endX, endY }) => {
+
+      this.allPoints.some((point) => {
+        const { x, y } = point
+        const minMaxX = [Math.floor(x - 3), Math.floor(x + 3)]
+        const minMaxY = [Math.floor(y - 3), Math.floor(y + 3)]
+
+        const conditionStartPoint = !!(minMaxX[0] < Math.floor(startX) && Math.floor(startX) < minMaxX[1] && minMaxY[0] < Math.floor(startY) && Math.floor(startY) < minMaxY[1])
+        const conditionEndPoint = !!(minMaxX[0] < Math.floor(endX) && Math.floor(endX) < minMaxX[1] && minMaxY[0] < Math.floor(endY) && Math.floor(endY) < minMaxY[1])
+
+        if (conditionStartPoint || conditionEndPoint) {
+          deletePoint.add(point)
+        }
+      })
+    })
+
+    return deletePoint
+  }
+
   clearArea() {
     this.ctx.clearRect(0, 0, this.width, this.height)
   }
@@ -50,8 +72,14 @@ export class Canvas {
     this.ctx.moveTo(x, y)
   }
 
+  collapseAllLine() {
+    this.allLine.forEach((line) => {
+      line.collapseLine()
+    })
+  }
+
   endDraw(mousePosition) {
-    if(!mousePosition) {
+    if (!mousePosition) {
       this.currentLine = {}
       this.currentPoints = []
       this.clearArea()
@@ -60,23 +88,19 @@ export class Canvas {
       return
     }
     const { x, y } = mousePosition
-    this.currentLine.updateEndPosition(x,y)
-    this.ctx.lineTo(this.currentLine.endX, this.currentLine.endY)
-    this.ctx.stroke()
+    this.currentLine.updateEndPosition(x, y)
     this.allLine.push(this.currentLine)
     this.allPoints.push(...this.currentPoints)
   }
 
   drawCurrentPoints() {
-    this.currentPoints.forEach(([x,y]) => {
-      const point = new Circle({x,y})
+    this.currentPoints.forEach((point) => {
       point.drawCircle(this.ctx)
     })
   }
 
   drawPreviousPoints() {
-    this.allPoints.forEach(([x,y]) => {
-      const point = new Circle({x,y})
+    this.allPoints.forEach((point) => {
       point.drawCircle(this.ctx)
     })
   }
@@ -85,13 +109,16 @@ export class Canvas {
     const { x, y } = mousePosition
     this.clearArea()
     this.drawAllLine()
-    this.currentLine.updateEndPosition(x,y)
-    if(this.allLine.length !== 0) {
-      this.currentPoints = this.currentLine.getPositionIntersection(this.allLine)
-      this.drawCurrentPoints()
-      this.drawPreviousPoints()
-    }
+    this.currentLine.updateEndPosition(x, y)
     this.drawLine(this.currentLine)
+    if (this.allLine.length !== 0) {
+      const arrPoints = this.currentLine.getPositionIntersection(this.allLine)
+      this.currentPoints = []
+      arrPoints.forEach((point) => {
+        this.currentPoints.push(new Circle({ x: point[0], y: point[1] }))
+      })
+      this.drawPreviousPoints()
+      this.drawCurrentPoints()
+    }
   }
-
 }

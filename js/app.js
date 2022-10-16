@@ -24,21 +24,35 @@ export class App {
   }
 
   onCollapseClick() {
-    if(this.isAnimated) { return }
-    if(this.canvas.allLine.length === 0) { return }
+    if (this.isAnimated) {
+      return
+    }
+    if (this.canvas.allLine.length === 0) {
+      return
+    }
     this.isAnimated = true
     const intervalID = setInterval(() => {
-      this.canvas.ctx.globalAlpha -= 0.01
+      this.canvas.collapseAllLine()   //////////////////////////////////
+      this.canvas.animationCounter -= 0.005
       this.canvas.drawAll()
-      if(this.canvas.ctx.globalAlpha <= 0.01) {
-        this.canvas.ctx.globalAlpha = 0
+
+      // Если начало или конеч линии (х у) хотя бы одной линии лежит на точке , начать уменьшать её
+
+      const arrStartDelete = this.canvas.checkEndLinePositionForPoint()
+      arrStartDelete.forEach((point) => {
+        point.collapseCircle(this.canvas.ctx)
+      })
+
+
+      ///////////////////
+      if (this.canvas.animationCounter <= 0.0001) {
         this.canvas.clearArea()
         clearInterval(intervalID)
         this.isAnimated = false
         this.canvas.clearAllData()
-        this.canvas.ctx.globalAlpha = 1
+        this.canvas.animationCounter = 1
       }
-    }, 30)
+    }, 15)
   }
 
   onCanvasClick() {
@@ -62,6 +76,3 @@ export class App {
     this.addListeners()
   }
 }
-
-
-
