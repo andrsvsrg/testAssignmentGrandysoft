@@ -10,9 +10,7 @@ export class App {
   }
 
   onUpdateMousePosition(e) {
-    const positionX = e.clientX - 30 < 0 ? 0 : e.clientX - 30
-    const positionY = e.clientY - 30 < 0 ? 0 : e.clientY - 30
-    this.mousePosition = { x: positionX, y: positionY }
+    this.mousePosition = { x: e.offsetX, y: e.offsetY }
     if (this.isDriwing) {
       this.canvas.animationLine(this.mousePosition)
     }
